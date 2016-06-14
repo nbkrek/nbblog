@@ -1,0 +1,5 @@
+- name: 'Installing Software'
+  apt: pkg={{ item }} state=installed
+  with_items:
+  - apache2
+  - php5
