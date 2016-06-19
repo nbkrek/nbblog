@@ -1,0 +1,8 @@
+# Configuration for DEV
+SetEnv 'folders-articles' /opt/articles
+
+RewriteEngine On
+
+RewriteRule ^$ app.php?type=home [L]
+RewriteRule ^index(.*) app.php?type=index&value=$1 [L]
+RewriteRule (.*) test.php [L]

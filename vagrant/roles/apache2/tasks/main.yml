@@ -3,3 +3,12 @@
   with_items:
   - apache2
   - libapache2-mod-php5
+
+- name: 'Enableing mod_rewirte'
+  shell: a2enmod rewrite && service apache2 restart
+
+- name: 'Copying Apache Config'
+  copy: src=../files/apache.config dest=/etc/apache2/conf-available/app.conf
+
+- name: 'Enabeling Apache Config'
+  shell: a2enconf app && service apache2 restart
