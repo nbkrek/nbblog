@@ -18,6 +18,7 @@ We use the following tools, so it really helps if you are familar with them.
 
 * git-flow
 * vagrant
+* composer
 
 Formating the articles
 ----------------------
