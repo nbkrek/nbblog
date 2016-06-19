@@ -1,6 +1,7 @@
 # Configuration for DEV
 SetEnv 'folders-articles' /opt/articles
 SetEnv 'folders-template' /opt/template
+SetEnv 'folders-templatecache' /tmp/templatecache
 
 Options -Indexes
 

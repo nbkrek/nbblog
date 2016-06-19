@@ -1,5 +1,7 @@
 <?php
 
+    require __DIR__ . '/vendor/autoload.php';
+
     // check if stub is valid.
     $stub = $_SERVER['REQUEST_URI'];
     $stub = substr($stub, 1);
@@ -24,27 +26,26 @@
         exit;
     }
 
-    // See if the extrated folder exists or is older as the file.
-    if (! file_exists($folderpath)
-        || filemtime($folderpath) < filemtime($filepath)) {
+    // Check if the tar.bz2 needs extracting.
+    require __DIR__ . '/tarbzextractor.inc.php';
 
-        if (file_exists($folderpath)) {
-            // Delete the folder 
-            system("rm -rf $folderpath");
-        }
+    // Loading the templating system.
+    require_once __DIR__ . '/vendor/twig/twig/lib/Twig/Autoloader.php';
+    Twig_Autoloader::register();
 
-        // Extract the tar.bz2 file.
-        system("tar --touch -C $documentroot -xjf $filepath");
-        
-        // Redirect to the same url.
-        header("Refresh:0");
-        exit;
+    $loader = new Twig_Loader_Filesystem($_SERVER['folders-template']);
+    $twig = new Twig_Environment($loader, array(
+        'cache' => $_SERVER['folders-templatecache'],
+        ));
 
-    }
 
+    // Actually display the file.
     $ourfile =  $stub . '/text.xml';
     $xml = file_get_contents($_SERVER['DOCUMENT_ROOT'] . '/' . $ourfile);
     $article = new SimpleXMLElement($xml);
 
     $content = $article->content[0]->asXML();
-    echo $content;
+
+    $template = $twig->loadTemplate('article.html'); 
+
+    echo $template->render(array('content' => $content));
