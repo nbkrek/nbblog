@@ -1,8 +1,25 @@
 # Configuration for DEV
 SetEnv 'folders-articles' /opt/articles
 
+Options -Indexes
+
 RewriteEngine On
+
+# We need to have the protocol set for later redirects.
+RewriteCond %{HTTPS} =on
+RewriteRule ^(.*)$ - [env=proto:https]
+RewriteCond %{HTTPS} !=on
+RewriteRule ^(.*)$ - [env=proto:http]
+
+
 
 RewriteRule ^$ app.php?type=home [L]
 RewriteRule ^index(.*) app.php?type=index&value=$1 [L]
+# We don't want the user to see the text.xml of an article.
+RewriteRule ^(.*)text\.xml$ %{ENV:proto}://%{HTTP_HOST}/$1 [R=301,L]
+
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule (.*) app.php [L]
+
+RewriteRule .*/$ articledisplay.php [L]

@@ -3,13 +3,13 @@
 
 # Decide if we have to display the index or an article.
 if (! isset($_GET['type'])) {
-	$type = 'article';
+	$type = 'unkown';
 } else {
 	$type = $_GET['type'];
 }
 
 
-if ($type == 'article') {
+if ($type == 'unkown') {
 
     // check if stub is valid.
     $stub = $_SERVER['REQUEST_URI'];
@@ -24,26 +24,30 @@ if ($type == 'article') {
     }
 
 
-    $folderpath = $_SERVER['folders-articles'] . $stub . '/';
-    $filepath = $_SERVER['folders-articles'] . $stub . '.tar.bz2';
+    $documentroot = $_SERVER['DOCUMENT_ROOT'];
+    $folderpath = $documentroot . '/' . $stub . '/';
+    $filepath = $_SERVER['folders-articles'] . '/' . $stub . '.tar.bz2';
 
     // See if the source file exists.
-    if (! file_exists($filepath) {
+    if (! file_exists($filepath)) {
         //$error->404();
         // TODO implement error system
     }
 
     // See if the extrated folder exists or is older as the file.
     if (! file_exists($folderpath)
-        || filemtime($folderpath) < filemtime($filepath) {
+        || filemtime($folderpath) < filemtime($filepath)) {
 
-        if (file_exists($folderpath) {
+        if (file_exists($folderpath)) {
             // Delete the folder 
-            // TODO
+            system("rm -rf $folderpath");
         }
 
         // Extract the tar.bz2 file.
-        system("cd " . getenv('folders-articles') . " && tar -xjf $filepath")
+        system("tar --touch -C $documentroot -xjf $filepath");
+        
+        // Redirect to the same url.
+        header("Refresh:0");
     }
 
 }
@@ -52,4 +56,5 @@ if ($type == 'index') {
 }
 
 if ($type == 'home') {
+    echo 'Home';
 }
