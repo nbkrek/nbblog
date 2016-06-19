@@ -18,7 +18,7 @@ if ($type == 'article') {
         $stub = substr($stub, 0, strpos($stub, '/'));
     }
 
-    if (! preg_match('/^[0-9-a-z-]+$/', $stub)) {
+    if (! preg_match('/^[0-9a-z-]+$/', $stub)) {
         //$error->404();
         // TODO: invalid stub
     }
