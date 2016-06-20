@@ -44,8 +44,26 @@
     $xml = file_get_contents($_SERVER['DOCUMENT_ROOT'] . '/' . $ourfile);
     $article = new SimpleXMLElement($xml);
 
-    $content = $article->content[0]->asXML();
+    // Determining which language to display.
+    $language = 'de'; //TODO: How do we want to set this? Env Variable, determine browser?
+
+    // Finding the content of the current language.
+    $content = $article->xpath('/article/content[@language="' . $language . '"]')[0]->asXML();
+
+    // Removing the <content>-Tags from the actual content.
+    $content = substr($content, strpos($content, '>') + 1);
+    $content = substr($content, 0, strrpos($content, '<'));
+
+    // Title
+    $title = (string) $article->xpath('/article/content[@language="' . $language . '"]')[0]['title'];
+
+    // Author
+    $author = array('name' => (string) $article->xpath('/article/meta/author/name')[0],
+               'email' => (string) $article->xpath('/article/meta/author/email')[0]);
+
+    // Date
+    $date = (string) $article->xpath('/article/meta/date')[0];
 
     $template = $twig->loadTemplate('article.html'); 
 
-    echo $template->render(array('content' => $content));
+    echo $template->render(array('content' => $content, 'title' => $title, 'author' => $author, 'date' => $date, 'language' => $language));

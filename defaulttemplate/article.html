@@ -1,5 +1,16 @@
-<html>
+<!doctype html>
+<html lang="{{ language }}">
+  <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>{{ title }}</title>
+   </head>
+   <body>
+        <h1>{{ title }}</h1>
 
-    {{ content|raw }}
-    
+        {{ content|raw }}
+
+        <hr />
+        <a href="mailto:{{ author.email }}">{{ author.name }}</a>
+   </body>
 </html>
