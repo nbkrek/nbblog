@@ -13,6 +13,13 @@ if ($type == '404') {
     echo 'File not found';
 }
 
+if ($type == 'article') {
+    // TODO: Get the stub of the article.
+
+    $article = new \nbkrnet\nblog\article\ArticleDisplay($stub);
+    $article->display();
+}
+
 if ($type == 'index') {
     echo 'index';
 }

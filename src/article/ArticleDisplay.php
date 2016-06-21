@@ -1,7 +1,6 @@
 <?php
 
-    require __DIR__ . '/vendor/autoload.php';
-    require_once __DIR__ . '/xmlextractor.inc.php';
+/*
 
     // check if stub is valid.
     $stub = $_SERVER['REQUEST_URI'];
@@ -46,4 +45,8 @@
 
     $language = 'de'; //TODO: We need to determine this rather than hardwireing it.
 
-    echo $template->render(array('data' => xmlextractor(file_get_contents($ourfile), $language)));
+    echo $template->render(array('data' => \nbkrnet\nbblog\util\XmlExtractor::extractor(file_get_contents($ourfile), $language)));
+ */
+
+class ArticleDisplay {
+}

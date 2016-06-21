@@ -24,10 +24,10 @@ RewriteRule ^index(.*) app.php?type=index&value=$1 [L]
 RewriteRule ^(.*)text\.xml$ %{ENV:proto}://%{HTTP_HOST}/$1 [R=301,L]
 
 # If we made it this far and the url ends with a / it must be an article 
-RewriteRule .*/$ articledisplay.php [L]
+RewriteRule .*/$ app.php?type=article [L]
 
 # Adding the index.html just in case someone adds this to the article url.
-RewriteRule .*/index\.html$ articledisplay.php [L]
+RewriteRule .*/index\.html$ app.php [L]
 
 # If a page can not be found.
 ErrorDocument 404 /app.php?type=404
