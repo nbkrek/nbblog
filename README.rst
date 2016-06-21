@@ -19,6 +19,7 @@ We use the following tools, so it really helps if you are familar with them.
 * git-flow
 * vagrant
 * composer
+* phpunit (4.8)
 
 Formating the articles
 ----------------------

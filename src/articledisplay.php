@@ -1,6 +1,7 @@
 <?php
 
     require __DIR__ . '/vendor/autoload.php';
+    require_once __DIR__ . '/xmlextractor.inc.php';
 
     // check if stub is valid.
     $stub = $_SERVER['REQUEST_URI'];
@@ -40,30 +41,9 @@
 
 
     // Actually display the file.
-    $ourfile =  $stub . '/text.xml';
-    $xml = file_get_contents($_SERVER['DOCUMENT_ROOT'] . '/' . $ourfile);
-    $article = new SimpleXMLElement($xml);
-
-    // Determining which language to display.
-    $language = 'de'; //TODO: How do we want to set this? Env Variable, determine browser?
-
-    // Finding the content of the current language.
-    $content = $article->xpath('/article/content[@language="' . $language . '"]')[0]->asXML();
-
-    // Removing the <content>-Tags from the actual content.
-    $content = substr($content, strpos($content, '>') + 1);
-    $content = substr($content, 0, strrpos($content, '<'));
-
-    // Title
-    $title = (string) $article->xpath('/article/content[@language="' . $language . '"]')[0]['title'];
-
-    // Author
-    $author = array('name' => (string) $article->xpath('/article/meta/author/name')[0],
-               'email' => (string) $article->xpath('/article/meta/author/email')[0]);
-
-    // Date
-    $date = (string) $article->xpath('/article/meta/date')[0];
-
+    $ourfile =  $_SERVER['DOCUMENT_ROOT'] '/' . $stub . '/text.xml';
     $template = $twig->loadTemplate('article.html'); 
 
-    echo $template->render(array('content' => $content, 'title' => $title, 'author' => $author, 'date' => $date, 'language' => $language));
+    $language = 'de'; //TODO: We need to determine this rather than hardwireing it.
+
+    echo $template->render(array('data' => xmlextractor(file_get_contents($ourfile), $language)));
