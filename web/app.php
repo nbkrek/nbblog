@@ -1,7 +1,8 @@
 <?php
 // vim: set tw=80 colorcolumn=-1 :
 
-# Decide if we have to display the index or an article.
+
+// Just a bit of boilerpate to tie the different objects together.
 if (! isset($_GET['type'])) {
 	$type = 'unkown';
 } else {
@@ -16,7 +17,13 @@ if ($type == '404') {
 if ($type == 'article') {
     // TODO: Get the stub of the article.
 
-    $article = new \nbkrnet\nblog\article\ArticleDisplay($stub);
+    try {
+        $article = \nbkrnet\nblog\article\ArticleDisplay::createFromStub($stub);
+    } catch (Exception $e) {
+        // TODO: 404
+        exit;
+    }
+
     $article->display();
 }
 
