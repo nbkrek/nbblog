@@ -1,2 +1,4 @@
-src/example*
 vendor
+web/example*
+exampledata/*
+!exampledata/*.tar.bz2

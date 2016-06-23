@@ -4,7 +4,10 @@
   - apache2
   - libapache2-mod-php5
 
-- name: 'Enableing mod_rewirte'
+- name: 'Removing /var/www/html'
+  file: path=/var/www/html state=absent 
+
+- name: 'Enabeling mod_rewrite'
   shell: a2enmod rewrite && service apache2 restart
 
 - name: 'Copying Apache Config'

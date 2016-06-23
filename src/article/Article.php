@@ -1,66 +1,65 @@
 <?php
 
-/*
-
-    // check if stub is valid.
-    $stub = $_SERVER['REQUEST_URI'];
-    $stub = substr($stub, 1);
-    if (strpos($stub, '/')) {
-        $stub = substr($stub, 0, strpos($stub, '/'));
-    }
-
-    if (! preg_match('/^[0-9a-z-]+$/', $stub)) {
-        //$error->404();
-        // TODO: invalid stub
-    }
-
-
-    $documentroot = $_SERVER['DOCUMENT_ROOT'];
-    $folderpath = $documentroot . '/' . $stub . '/';
-    $filepath = $_SERVER['folders-articles'] . '/' . $stub . '.tar.bz2';
-
-    // See if the source file exists.
-    if (! file_exists($filepath)) {
-        // TODO implement error system
-        //$error->404();
-        exit;
-    }
-
-    // Check if the tar.bz2 needs extracting.
-    require __DIR__ . '/tarbzextractor.inc.php';
-
-    // Loading the templating system.
-    require_once __DIR__ . '/vendor/twig/twig/lib/Twig/Autoloader.php';
-    Twig_Autoloader::register();
-
-    $loader = new Twig_Loader_Filesystem($_SERVER['folders-template']);
-    $twig = new Twig_Environment($loader, array(
-        'cache' => $_SERVER['folders-templatecache'],
-        ));
-
-
-    // Actually display the file.
-    $ourfile =  $_SERVER['DOCUMENT_ROOT'] '/' . $stub . '/text.xml';
-    $template = $twig->loadTemplate('article.html'); 
-
-    $language = 'de'; //TODO: We need to determine this rather than hardwireing it.
-
-    echo $template->render(array('data' => \nbkrnet\nbblog\util\XmlExtractor::extractor(file_get_contents($ourfile), $language)));
- */
 namespace nbkrnet\nbblog\article;
 
 class Article {
 
-    public static function loadFromStub($stub) {
-        throw new \Exception('Invalid stub.');
+    function __construct($container, $stub) {
+
+        $this->c = $container;
+        $this->stub = $stub;
+
+        // Check if the this->stub is valid.
+        // The app.php does this already, but it doesn't hurt to do
+        // it again, just in case ...
+        if (strpos($this->stub, '/')) {
+            $this->stub = substr($this->stub, 0, strpos($this->stub, '/'));
+        }
+
+        if (! preg_match('/^[0-9a-z-]+$/', $this->stub)) {
+            throw new \Exception('Stub is invalid.');
+        }
+
+        $filepath = $this->c['config_folders-articles'] . '/' . $this->stub . '.tar.bz2';
+
+        if (! file_exists($filepath)) {
+            throw new \Exception('Could not find tar.bz2 file to that stub.');
+        }
+
+        // See if the source file exists.
+        $this->extractTarBz();
+
     }
 
-    public static function loadFromString($string) {
-        try {
-            $data = new \SimpleXMLElement($string);
-        } catch (Exception $e) {
-            throw $e;
+    private function extractTarBz() {
+
+        $folderpath = $this->c['config_folders-extract'] . '/' . $this->stub . '/';
+        $filepath = $this->c['config_folders-articles'] . '/' . $this->stub . '.tar.bz2';
+
+        if (! file_exists($folderpath)
+            || filemtime($folderpath) < filemtime($filepath)) {
+
+            if (file_exists($folderpath)) {
+                // Delete the folder 
+                system("rm -rf $folderpath");
+            }
+
+            // Extract the tar.bz2 file.
+            system("tar --touch -C " . $this->c['config_folders-extract'] . " -xjf $filepath");
+            
         }
-    }    
+    }
+
+    public function renderHtml() {
+        $twig = $this->c['twig'];
+
+        // Actually display the file.
+        $ourfile =  $this->c['config_folders-extract'] . '/' . $this->stub . '/text.xml';
+        $template = $twig->loadTemplate('article.html'); 
+
+        $language = 'de'; //TODO
+
+        return $template->render(array('data' => \nbkrnet\nbblog\utils\XmlExtractor::extractor(file_get_contents($ourfile), $language)));
+    }
 
 }
