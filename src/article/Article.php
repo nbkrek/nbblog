@@ -15,6 +15,7 @@ class Article {
         if (! preg_match('/^[0-9a-z-]+$/', $this->stub)) {
             throw new \Exception('Stub is invalid.');
         }
+       
 
         $filepath = $this->c['config_folders-articles'] . '/' . $this->stub . '.tar.bz2';
 

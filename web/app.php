@@ -7,32 +7,49 @@ use \Slim\Exception\NotFoundException as NotFoundException;
 
 require '../vendor/autoload.php';
 
-$app = new \Slim\App;
 
-// Our Pimple Container for the nbblog software.
-// I'm not sure if we could/should use the slim container ourself.
-$nbblogcontainer = new \Pimple\Container();
-foreach ($_SERVER as $key => $value) {
-    // Our configuration is stored in the webserver environment using lowerkey values.
-    // so we just transfer every lowerkey value to our Container and we have our configuration
-    // done.
-    if (ctype_lower($key)) {
-        $nbblogcontainer['config_' . $key] = $value;
+// The container for our app.
+
+
+$container = new \Slim\Container;
+$container['nbblogcontainer'] = function ($c) {
+    $nbblogcontainer = new \Pimple\Container;
+    foreach ($_SERVER as $key => $value) {
+        // Our configuration is stored in the webserver environment using lowerkey values.
+        // so we just transfer every lowerkey value to our Container and we have our configuration
+        // done. 
+        //
+        // However, PHP running in CGI Mode shows a problem as mod_rewrite will add a "REDIRECT_" to 
+        // the variable name. Switching to mod_php or fcgi removes this behaviour, but hat might
+        // not always be an option. So I'm tenting to remove the REDIRECT_ from keys and therefore
+        // make it work on all php installations.
+        //
+        // Hoever there is one parameter called 'REDIRECT_URL' that doesn't come from mod_rewrite
+        // so i have to exclude this also
+        //
+        // TODO: Make this somehow nicer.
+        if (strpos($key, '-') !== false) {
+            $nbblogcontainer['config_' . str_replace('REDIRECT_', '', $key)] = $value;
+        }
     }
-}
 
-$nbblogcontainer['twig'] = function ($c) {
-            // Loading the templating system.
-            require_once __DIR__ . '/../vendor/twig/twig/lib/Twig/Autoloader.php';
-            Twig_Autoloader::register();
+    $nbblogcontainer['twig'] = function ($c) {
+                // Loading the templating system.
+                require_once __DIR__ . '/../vendor/twig/twig/lib/Twig/Autoloader.php';
+                Twig_Autoloader::register();
 
-            $loader = new Twig_Loader_Filesystem($c['config_folders-template']);
+                $loader = new Twig_Loader_Filesystem($c['config_folders-template']);
 
-            return new Twig_Environment($loader, array(
-                'cache' => $c['config_folders-templatecache'];
-                ));
+                return new Twig_Environment($loader, array(
+                    'cache' => $c['config_folders-templatecache'],
+                    ));
 
-        };
+            };
+
+    return $nbblogcontainer;
+};
+
+$app = new \Slim\App($container);
 
 
 $app->get('/{stub:[a-z0-9-]+$}', function (Request $request, Response $response, $args) {
@@ -49,10 +66,10 @@ $app->get('/{stub:[a-z0-9-]+/$}', function (Request $request, Response $response
 
     // The stub is the thing between the slashes.
     $stub = $args['stub'];
-    $stub = substr($stub, 0, strlen($sub) -1);
+    $stub = substr($stub, 0, strlen($stub) -1);
 
     try {
-        $article = Article::loadFromStub($nbblogcontainer, $stub);
+        $article = new Article($this->get('nbblogcontainer'), $stub);
     } catch (Exception $e) {
         throw new NotFoundException($request, $response);
     }
