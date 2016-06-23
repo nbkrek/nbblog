@@ -20,6 +20,7 @@ We use the following tools, so it really helps if you are familar with them.
 * vagrant
 * composer
 * phpunit (4.8)
+* slim V3
 
 Formating the articles
 ----------------------

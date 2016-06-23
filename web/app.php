@@ -1,36 +1,38 @@
 <?php
-// vim: set tw=80 colorcolumn=-1 :
+
+use \Psr\Http\Message\ServerRequestInterface as Request;
+use \Psr\Http\Message\ResponseInterface as Response;
+use \nbkrnet\nbblog\article\Article as Article;
+use \Slim\Exception\NotFoundException as NotFoundException;
+
+require '../vendor/autoload.php';
+
+$app = new \Slim\App;
 
 
-// Just a bit of boilerpate to tie the different objects together.
-if (! isset($_GET['type'])) {
-	$type = 'unkown';
-} else {
-	$type = $_GET['type'];
-}
+$app->get('/{stub:[a-z0-9-]+$}', function (Request $request, Response $response, $args) {
+    //Article without / in the url. Redirect to the correct with /.
+    $uri = $request->getUri();
+    $path = $uri->getPath();
+    if ($path != '/' && substr($path, -1) != '/') {
+        $uri = $uri->withPath($path . '/');
+        return $response->withRedirect((string)$uri, 301);
+    }
+});
 
+$app->get('/{stub:[a-z0-9-]+/$}', function (Request $request, Response $response, $args) {
 
-if ($type == '404') {
-    echo 'File not found';
-}
-
-if ($type == 'article') {
-    // TODO: Get the stub of the article.
+    // The stub is the thing between the slashes.
+    $stub = $args['stub'];
+    $stub = substr($stub, 0, strlen($sub) -1);
 
     try {
-        $article = \nbkrnet\nblog\article\ArticleDisplay::createFromStub($stub);
+        $article = Article::loadFromStub($stub);
     } catch (Exception $e) {
-        // TODO: 404
-        exit;
+        throw new NotFoundException($request, $response);
     }
+    $response->getBody()->write($article->renderHtml());
 
-    $article->display();
-}
-
-if ($type == 'index') {
-    echo 'index';
-}
-
-if ($type == 'home') {
-    echo 'Home';
-}
+    return $response;
+});
+$app->run();

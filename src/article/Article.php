@@ -47,6 +47,20 @@
 
     echo $template->render(array('data' => \nbkrnet\nbblog\util\XmlExtractor::extractor(file_get_contents($ourfile), $language)));
  */
+namespace nbkrnet\nbblog\article;
 
-class ArticleDisplay {
+class Article {
+
+    public static function loadFromStub($stub) {
+        throw new \Exception('Invalid stub.');
+    }
+
+    public static function loadFromString($string) {
+        try {
+            $data = new \SimpleXMLElement($string);
+        } catch (Exception $e) {
+            throw $e;
+        }
+    }    
+
 }

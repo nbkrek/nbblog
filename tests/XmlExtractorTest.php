@@ -1,9 +1,7 @@
 <?php
 
-require '../src/xmlextractor.inc.php';
+class XMLExtractorTest extends PHPUnit_Framework_TestCase {
 
-class XMLExtractoTest extends PHPUnit_Framework_TestCase
-{
     public function testXmlExtractor_for_article()
     {
         $filecontent = <<<XML
@@ -53,7 +51,7 @@ class XMLExtractoTest extends PHPUnit_Framework_TestCase
 </article>
 XML;
 
-        $data = xmlextractor($filecontent); 
+        $data = \nbkrnet\nbblog\utils\XmlExtractor::extractor($filecontent); 
 
         foreach (array('date', 'author', 'content', 'title', 'language') as $key) {
             $this->assertArrayHasKey($key, $data);
@@ -102,7 +100,7 @@ XML;
 </page>
 XML;
 
-        $data = xmlextractor($filecontent); 
+        $data = \nbkrnet\nbblog\utils\XmlExtractor::extractor($filecontent); 
 
         foreach (array('content', 'title', 'language') as $key) {
             $this->assertArrayHasKey($key, $data);

@@ -17,17 +17,5 @@ RewriteRule ^(.*)$ - [env=proto:https]
 RewriteCond %{HTTPS} !=on
 RewriteRule ^(.*)$ - [env=proto:http]
 
-
-RewriteRule ^$ app.php?type=home [L]
-RewriteRule ^index(.*) app.php?type=index&value=$1 [L]
-# We don't want the user to see the text.xml of an article.
-RewriteRule ^(.*)text\.xml$ %{ENV:proto}://%{HTTP_HOST}/$1 [R=301,L]
-
-# If we made it this far and the url ends with a / it must be an article 
-RewriteRule .*/$ app.php?type=article [L]
-
-# Adding the index.html just in case someone adds this to the article url.
-RewriteRule .*/index\.html$ app.php [L]
-
-# If a page can not be found.
-ErrorDocument 404 /app.php?type=404
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^ app.php [QSA,L]
