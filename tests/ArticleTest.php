@@ -23,7 +23,7 @@ class ArticleTest extends PHPUnit_Framework_TestCase {
     }
 
     protected function tearDown() {
-        system ('rm -rf ' . __DIR__ . '/../exampledata/examplearticle');
+        //system ('rm -rf ' . __DIR__ . '/../exampledata/examplearticle');
     }
 
     /**
@@ -35,6 +35,21 @@ class ArticleTest extends PHPUnit_Framework_TestCase {
 
     public function test_ValidStub() {
         $data = new \nbkrnet\nbblog\article\Article($this->c, 'examplearticle');
+    }
+
+    /**
+     * @expectedException Exception
+     */
+    public function test_ValidStubWithoutTarBz() {
+        $data = new \nbkrnet\nbblog\article\Article($this->c, 'examplearticlenortarfile');
+    }
+
+    public function test_updateTarFile() {
+        // Mainly for code coverage. Not entirly sure how to check the deletion in between.
+        $data = new \nbkrnet\nbblog\article\Article($this->c, 'examplearticle');
+        system('touch -d "2100-01-01 12:00:00" ' . __DIR__ . '/../exampledata/examplearticle.tar.bz2');
+        $data = new \nbkrnet\nbblog\article\Article($this->c, 'examplearticle');
+        system('touch ' . __DIR__ . '/../exampledata/examplearticle.tar.bz2');
     }
 
     public function test_renderHtml() {

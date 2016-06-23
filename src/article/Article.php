@@ -12,10 +12,6 @@ class Article {
         // Check if the this->stub is valid.
         // The app.php does this already, but it doesn't hurt to do
         // it again, just in case ...
-        if (strpos($this->stub, '/')) {
-            $this->stub = substr($this->stub, 0, strpos($this->stub, '/'));
-        }
-
         if (! preg_match('/^[0-9a-z-]+$/', $this->stub)) {
             throw new \Exception('Stub is invalid.');
         }
