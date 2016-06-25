@@ -53,7 +53,7 @@ XML;
 
         $data = \nbkrnet\nbblog\utils\XmlExtractor::extractor($filecontent); 
 
-        foreach (array('date', 'author', 'content', 'title', 'language') as $key) {
+        foreach (array('date', 'author', 'content', 'title', 'language', 'type') as $key) {
             $this->assertArrayHasKey($key, $data);
         }
 
@@ -102,7 +102,7 @@ XML;
 
         $data = \nbkrnet\nbblog\utils\XmlExtractor::extractor($filecontent); 
 
-        foreach (array('content', 'title', 'language') as $key) {
+        foreach (array('content', 'title', 'language', 'type') as $key) {
             $this->assertArrayHasKey($key, $data);
         }
 

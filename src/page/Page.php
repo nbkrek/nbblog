@@ -1,8 +1,8 @@
 <?php
 
-namespace nbkrnet\nbblog\article;
+namespace nbkrnet\nbblog\page;
 
-class Article {
+class Page {
 
     function __construct($container, $xmlstring) {
 
@@ -14,7 +14,7 @@ class Article {
     public function renderHtml() {
         $twig = $this->c['twig'];
 
-        $template = $twig->loadTemplate('article.html'); 
+        $template = $twig->loadTemplate('page.html'); 
 
         $language = 'de'; //TODO
 

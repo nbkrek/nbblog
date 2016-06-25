@@ -1,12 +1,12 @@
 <?php
 
-class ArticleTest extends PHPUnit_Framework_TestCase {
+class PageTest extends PHPUnit_Framework_TestCase {
 
     protected function setUp() {
-        system ('rm -rf ' . __DIR__ . '/../exampledata/examplearticle');
+        system ('rm -rf ' . __DIR__ . '/../exampledata/examplepage');
 
         $this->c = new \Pimple\Container();
-        $this->c['config_folders-articles'] = __DIR__ . '/../exampledata';
+        $this->c['config_folders-pages'] = __DIR__ . '/../exampledata';
         $this->c['config_folders-extract'] = __DIR__ . '/../exampledata';
         $this->c['twig'] = function ($c) {
             // Loading the templating system.
@@ -23,14 +23,14 @@ class ArticleTest extends PHPUnit_Framework_TestCase {
     }
 
     protected function tearDown() {
-        system ('rm -rf ' . __DIR__ . '/../exampledata/examplearticle');
+        system ('rm -rf ' . __DIR__ . '/../exampledata/examplepage');
     }
 
 
     public function test_renderHtml() {
         $xmlstring = <<<XML
 <?xml version="1.0" encoding="UTF-8" standalone="no" ?>
-<article>
+<page>
 
     <meta>
         <author>
@@ -72,9 +72,9 @@ class ArticleTest extends PHPUnit_Framework_TestCase {
 
     </content>
 
-</article>
+</page>
 XML;
-        $data = new \nbkrnet\nbblog\article\Article($this->c, $xmlstring);
+        $data = new \nbkrnet\nbblog\page\Page($this->c, $xmlstring);
         $result = $data->renderHtml();
         $this->assertTrue(strpos($result, '<html') !== false);
     }

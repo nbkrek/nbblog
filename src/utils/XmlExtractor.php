@@ -39,11 +39,13 @@ class XmlExtractor {
             return array('title' => $title,
                          'content' => $content,
                          'author' => $author,
+                         'type' => $type,
                          'language' => $language,
                          'date' => $date);
         } else {
             return array('title' => $title,
                          'content' => $content,
+                         'type' => $type,
                          'language' => $language);
         }
 

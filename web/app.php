@@ -3,6 +3,7 @@
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
 use \nbkrnet\nbblog\article\Article as Article;
+use \nbkrnet\nbblog\contenthandler\ContentHandler as ContentHandler;
 use \Slim\Exception\NotFoundException as NotFoundException;
 
 require '../vendor/autoload.php';
@@ -69,11 +70,17 @@ $app->get('/{stub:[a-z0-9-]+/$}', function (Request $request, Response $response
     $stub = substr($stub, 0, strlen($stub) -1);
 
     try {
-        $article = new Article($this->get('nbblogcontainer'), $stub);
+        $content = new ContentHandler($this->get('nbblogcontainer'), $stub);
     } catch (Exception $e) {
         throw new NotFoundException($request, $response);
     }
-    $response->getBody()->write($article->renderHtml());
+
+    $renderer = $content->getRenderer();
+    try {
+        $response->getBody()->write($renderer->renderHtml());
+    } catch (Exception $e) {
+        return $response->withRedirect('/', 301);
+    }
 
     return $response;
 });
