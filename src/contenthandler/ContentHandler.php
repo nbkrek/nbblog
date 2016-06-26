@@ -41,7 +41,10 @@ class ContentHandler {
             if ($this->xml['type'] == 'article') {
                 $this->contenttype = 'article';
 
-                // We need to add this to the index
+                // We need to add this to the index -- but only once!
+                $sth = $this->c['db']->prepare('DELETE FROM articles WHERE stub = ?');
+                $sth->execute(array($this->stub));
+
                 $sth = $this->c['db']->prepare('INSERT INTO articles (stub, publishdate) VALUES(?, ?)');
                 $sth->execute(array($this->stub, $this->xml['date']));
             }

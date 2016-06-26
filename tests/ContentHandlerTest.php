@@ -109,4 +109,12 @@ class ContentHandlerTest extends PHPUnit_Framework_TestCase {
         $res = $this->c['db']->query("SELECT COUNT(*) AS res FROM articles WHERE stub = 'examplearticle'")->fetch();
         $this->assertEquals('1', $res['res']);
     }
+
+    public function test_articleAddedToIndexDbOnlyOnce() {
+        $res = $this->c['db']->exec('DELETE FROM articles');
+        $data = new \nbkrnet\nbblog\contenthandler\ContentHandler($this->c, 'examplearticle');
+        $data = new \nbkrnet\nbblog\contenthandler\ContentHandler($this->c, 'examplearticle');
+        $res = $this->c['db']->query("SELECT COUNT(*) AS res FROM articles WHERE stub = 'examplearticle'")->fetch();
+        $this->assertEquals('1', $res['res']);
+    }
 }
