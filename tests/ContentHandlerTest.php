@@ -22,6 +22,16 @@ class ContentHandlerTest extends PHPUnit_Framework_TestCase {
                 ));
 
         };
+
+        $this->c['db'] = function ($c) {
+            $db = new \PDO('sqlite:/tmp/nbblogtest.db');
+            $db->exec("CREATE TABLE IF NOT EXISTS articles (
+                           id INTEGER PRIMARY KEY, 
+                           stub TEXT, 
+                           publishdate DATETIME)");
+
+            return $db;
+        };
     }
 
     protected function tearDown() {
@@ -29,6 +39,7 @@ class ContentHandlerTest extends PHPUnit_Framework_TestCase {
         system ('rm -rf ' . __DIR__ . '/../exampledata/examplepage');
         system ('rm -rf ' . __DIR__ . '/../exampledata/static');
         system ('rm -rf ' . __DIR__ . '/../exampledata/invalidrenderer');
+        system ('rm -rf /tmp/nbblogtest.db');
     }
 
     /**
@@ -47,6 +58,21 @@ class ContentHandlerTest extends PHPUnit_Framework_TestCase {
      */
     public function test_ValidStubWithoutTarBz() {
         $data = new \nbkrnet\nbblog\contenthandler\ContentHandler($this->c, 'examplearticlenortarfile');
+    }
+
+    public function test_ContentTypeArticle() {
+        $data = new \nbkrnet\nbblog\contenthandler\ContentHandler($this->c, 'examplearticle');
+        $this->assertEquals('article', $data->getContentType());
+    }
+
+    public function test_ContentTypePage() {
+        $data = new \nbkrnet\nbblog\contenthandler\ContentHandler($this->c, 'examplepage');
+        $this->assertEquals('page', $data->getContentType());
+    }
+
+    public function test_ContentTypeUnknown() {
+        $data = new \nbkrnet\nbblog\contenthandler\ContentHandler($this->c, 'static');
+        $this->assertEquals('unknown', $data->getContentType());
     }
 
     public function test_updateTarFile() {
@@ -69,17 +95,18 @@ class ContentHandlerTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals('nbkrnet\nbblog\page\Page', get_class($emp));
     }
 
-    public function test_getEmptyRenderer() {
-        $data = new \nbkrnet\nbblog\contenthandler\ContentHandler($this->c, 'static');
-        $emp = $data->getRenderer();
-        $this->assertEquals('nbkrnet\nbblog\contenthandler\EmptyHandler', get_class($emp));
-    }
-
     /**
      * @expectedException Exception
      */
     public function test_unkownRenderer() {
         $data = new \nbkrnet\nbblog\contenthandler\ContentHandler($this->c, 'invalidrenderer');
         $emp = $data->getRenderer();
+    }
+
+    public function test_articleAddedToIndexDb() {
+        $res = $this->c['db']->exec('DELETE FROM articles');
+        $data = new \nbkrnet\nbblog\contenthandler\ContentHandler($this->c, 'examplearticle');
+        $res = $this->c['db']->query("SELECT COUNT(*) AS res FROM articles WHERE stub = 'examplearticle'")->fetch();
+        $this->assertEquals('1', $res['res']);
     }
 }

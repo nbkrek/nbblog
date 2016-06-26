@@ -2,8 +2,8 @@
 
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
-use \nbkrnet\nbblog\article\Article as Article;
 use \nbkrnet\nbblog\contenthandler\ContentHandler as ContentHandler;
+use \nbkrnet\nbblog\index\Index as Index;
 use \Slim\Exception\NotFoundException as NotFoundException;
 
 require '../vendor/autoload.php';
@@ -13,6 +13,12 @@ require '../vendor/autoload.php';
 
 
 $container = new \Slim\Container;
+
+if (isset($_SERVER['debug-mode']) ||
+    isset($_SERVER['REDIRECT_debug-mode'])) {
+    $container['settings']['displayErrorDetails'] = true;
+}
+
 $container['nbblogcontainer'] = function ($c) {
     $nbblogcontainer = new \Pimple\Container;
     foreach ($_SERVER as $key => $value) {
@@ -47,10 +53,27 @@ $container['nbblogcontainer'] = function ($c) {
 
             };
 
+    $nbblogcontainer['db'] = function ($c) {
+            $db = new \PDO('sqlite:' . $c['config_database-file']);
+            $db->exec("CREATE TABLE IF NOT EXISTS articles (
+                           id INTEGER PRIMARY KEY, 
+                           stub TEXT, 
+                           publishdate DATETIME)");
+
+            return $db;
+        };
+
     return $nbblogcontainer;
 };
 
 $app = new \Slim\App($container);
+
+$app->get('/', function (Request $request, Response $response) {
+    // Home - show the index
+    $index = new Index($this->get('nbblogcontainer'));
+    $response->getBody()->write($index->renderHtml());
+    return $response;
+});
 
 
 $app->get('/{stub:[a-z0-9-]+$}', function (Request $request, Response $response, $args) {

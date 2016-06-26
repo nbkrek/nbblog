@@ -20,10 +20,20 @@ class ArticleTest extends PHPUnit_Framework_TestCase {
                 ));
 
         };
+        $this->c['db'] = function ($c) {
+            $db = new \PDO('sqlite:/tmp/nbblogtest.db');
+            $db->exec("CREATE TABLE IF NOT EXISTS articles (
+                           id INTEGER PRIMARY KEY, 
+                           stub TEXT, 
+                           publishdate DATETIME)");
+
+            return $db;
+        };
     }
 
     protected function tearDown() {
         system ('rm -rf ' . __DIR__ . '/../exampledata/examplearticle');
+        system ('rm -rf /tmp/nbblogtest.db');
     }
 
 
@@ -78,5 +88,6 @@ XML;
         $result = $data->renderHtml();
         $this->assertTrue(strpos($result, '<html') !== false);
     }
+
 
 }
