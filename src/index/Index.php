@@ -22,7 +22,7 @@ class Index {
             $xmlstring = file_get_contents($textxml);
             $article = \nbkrnet\nbblog\utils\XmlExtractor::extractor($xmlstring, $language);
             // We have to replace the paths of the images.
-            $article['content'] = preg_replace('/img(.*)src="(.*)"/U', 'img$1src="' . $res['stub'] . '/$2"', $article['content']);
+            $article['content'] = preg_replace('/<img(.*)src="(.*)"/U', '<img$1src="' . $res['stub'] . '/$2"', $article['content']);
 
             $data[] = $article;
         }

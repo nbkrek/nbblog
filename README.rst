@@ -49,6 +49,26 @@ while this is not ::
     <img style="border solid 1px" ...>
 
 The template will provide the appropriate CSS classes.
+
+Images
+^^^^^^
+Images are stored with the article files. So they are basically inside the
+tar.bz2 files (see next section for details). 
+
+This brings one problem. The path to the image would be::
+
+    stub/images/bla.gif
+
+Inside the text.xml it would be more convenient to use just 'images/bla.gif'.
+This way changing the stub wouldn't require editing the text.xml.
+
+If we do this that way we have to rewrite the index-Handler to add the stub to
+image paths. That in turn requires a regex, so images should always follow this
+template
+
+    <img.*src="<yourimage>"
+
+otherwise the regex won't work.
       
 Packaging of articles
 ---------------------
