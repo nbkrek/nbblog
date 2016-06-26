@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="de">
+  <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Title</title>
+   </head>
+   <body>
+        {% for d in data %}
+            <h1>{{ d.title }}</h1>
+
+
+            {{ d.content|raw }}
+
+            <hr />
+            <a href="mailto:{{ d.author.email }}">{{ d.author.name }}</a>
+        {% endfor %}
+   </body>
+</html>
