@@ -16,7 +16,6 @@ class ContentHandler {
             throw new \Exception('Stub is invalid.');
         }
        
-
         $filepath = $this->c['config_folders-articles'] . '/' . $this->stub . '.tar.bz2';
 
         if (! file_exists($filepath)) {
@@ -41,12 +40,48 @@ class ContentHandler {
             if ($this->xml['type'] == 'article') {
                 $this->contenttype = 'article';
 
-                // We need to add this to the index -- but only once!
-                $sth = $this->c['db']->prepare('DELETE FROM articles WHERE stub = ?');
-                $sth->execute(array($this->stub));
+                // Get the article id from the database
+                $sth = $this->c['db']->prepare('SELECT id FROM articles WHERE stub = ?');
+                $res = $sth->execute(array($this->stub));
 
-                $sth = $this->c['db']->prepare('INSERT INTO articles (stub, publishdate) VALUES(?, ?)');
-                $sth->execute(array($this->stub, $this->xml['date']));
+                $articleid = Null;
+                if (! isset($sth->fetch()[0])) {
+                    // Insert new article
+                    $sth2 = $this->c['db']->prepare('INSERT INTO articles (stub, publishdate) VALUES(?, ?)');
+                    $sth2->execute(array($this->stub, $this->xml['date']));
+                    $articleid = $this->c['db']->lastInsertId();
+                } else {
+                    $aticleid = $sth->fetch()[0];
+                }
+
+                // Remove existing tag2article assignements for this article
+                $sth = $this->c['db']->prepare('DELETE FROM tags2articles WHERE articleid = ?');
+                $sth->execute(array($articleid));
+
+                // We also need to add the tags to the database and link them
+                foreach ($this->xml['tags'] as $tag) {
+                    // Normalise tag
+                    $tag = strtolower($tag);
+                    $tag = str_replace(' ', '-', $tag);
+
+                    // Get the tag id from the table, if it exists, otherwise create it.
+                    $sth = $this->c['db']->prepare('SELECT id FROM tags WHERE tag = ?');
+                    $res = $sth->execute(array($tag));
+                    $tagid = null;
+                    if (! isset($sth->fetch()[0])) {
+                        // Insert new tag
+                        $sth2 = $this->c['db']->prepare('INSERT INTO tags (tag) VALUES(?)');
+                        $sth2->execute(array($tag));
+                        $tagid = $this->c['db']->lastInsertId();
+                    } else {
+                        $tagid = $sth->fetch()[0];
+                    }
+
+
+                    // Add the new link
+                    $sth = $this->c['db']->prepare('INSERT INTO tags2articles (tagid, articleid) VALUES(?, ?)');
+                    $sth->execute(array($tagid, $articleid));
+                }
             }
 
             if ($this->xml['type'] == 'page') {

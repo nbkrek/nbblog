@@ -14,6 +14,10 @@ class XMLExtractorTest extends PHPUnit_Framework_TestCase {
             <email>nf@nbkr.net</email>
         </author>
         <date>2016-06-16T12:13:14</date>
+        <tags>
+            <tag>Kategorie 1</tag>
+            <tag>Kategorie 2</tag>
+        </tags>
     </meta>
 
     <content language="de" title="Beispielblubb">
@@ -53,9 +57,12 @@ XML;
 
         $data = \nbkrnet\nbblog\utils\XmlExtractor::extractor($filecontent); 
 
-        foreach (array('date', 'author', 'content', 'title', 'language', 'type') as $key) {
+        foreach (array('date', 'author', 'content', 'title', 'language', 'type', 'tags') as $key) {
             $this->assertArrayHasKey($key, $data);
         }
+
+        $this->assertTrue(in_array('Kategorie 1', $data['tags']));
+        $this->assertTrue(in_array('Kategorie 2', $data['tags']));
 
     }
 
@@ -105,6 +112,7 @@ XML;
         foreach (array('content', 'title', 'language', 'type') as $key) {
             $this->assertArrayHasKey($key, $data);
         }
+
 
     }
 }

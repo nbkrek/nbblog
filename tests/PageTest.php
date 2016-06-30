@@ -13,7 +13,7 @@ class PageTest extends PHPUnit_Framework_TestCase {
             require_once __DIR__ . '/../vendor/twig/twig/lib/Twig/Autoloader.php';
             Twig_Autoloader::register();
 
-            $loader = new Twig_Loader_Filesystem(__DIR__ . '/../defaulttemplate');
+            $loader = new Twig_Loader_Filesystem(__DIR__ . '/../testtemplate');
 
             return new Twig_Environment($loader, array(
                 'cache' => '/tmp/templatecache'

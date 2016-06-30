@@ -6,6 +6,7 @@ class ContentHandlerTest extends PHPUnit_Framework_TestCase {
         system ('rm -rf ' . __DIR__ . '/../exampledata/examplepage');
         system ('rm -rf ' . __DIR__ . '/../exampledata/static');
         system ('rm -rf ' . __DIR__ . '/../exampledata/invalidrenderer');
+        system ('rm -rf /tmp/nbblogtest.db');
 
         $this->c = new \Pimple\Container();
         $this->c['config_folders-articles'] = __DIR__ . '/../exampledata';
@@ -15,7 +16,7 @@ class ContentHandlerTest extends PHPUnit_Framework_TestCase {
             require_once __DIR__ . '/../vendor/twig/twig/lib/Twig/Autoloader.php';
             Twig_Autoloader::register();
 
-            $loader = new Twig_Loader_Filesystem(__DIR__ . '/../defaulttemplate');
+            $loader = new Twig_Loader_Filesystem(__DIR__ . '/../testtemplate');
 
             return new Twig_Environment($loader, array(
                 'cache' => '/tmp/templatecache'
@@ -23,23 +24,16 @@ class ContentHandlerTest extends PHPUnit_Framework_TestCase {
 
         };
 
-        $this->c['db'] = function ($c) {
-            $db = new \PDO('sqlite:/tmp/nbblogtest.db');
-            $db->exec("CREATE TABLE IF NOT EXISTS articles (
-                           id INTEGER PRIMARY KEY, 
-                           stub TEXT, 
-                           publishdate DATETIME)");
+        include 'db.inc';
 
-            return $db;
-        };
     }
 
     protected function tearDown() {
-        system ('rm -rf ' . __DIR__ . '/../exampledata/examplearticle');
+        #system ('rm -rf ' . __DIR__ . '/../exampledata/examplearticle');
         system ('rm -rf ' . __DIR__ . '/../exampledata/examplepage');
         system ('rm -rf ' . __DIR__ . '/../exampledata/static');
         system ('rm -rf ' . __DIR__ . '/../exampledata/invalidrenderer');
-        system ('rm -rf /tmp/nbblogtest.db');
+        //system ('rm -rf /tmp/nbblogtest.db');
     }
 
     /**
@@ -115,6 +109,17 @@ class ContentHandlerTest extends PHPUnit_Framework_TestCase {
         $data = new \nbkrnet\nbblog\contenthandler\ContentHandler($this->c, 'examplearticle');
         $data = new \nbkrnet\nbblog\contenthandler\ContentHandler($this->c, 'examplearticle');
         $res = $this->c['db']->query("SELECT COUNT(*) AS res FROM articles WHERE stub = 'examplearticle'")->fetch();
+        $this->assertEquals('1', $res['res']);
+    }
+
+    public function test_tagsIntoDb() {
+        $res = $this->c['db']->exec('DELETE FROM tags2articles');
+        $res = $this->c['db']->exec('DELETE FROM articles');
+        $res = $this->c['db']->exec('DELETE FROM tags');
+        $data = new \nbkrnet\nbblog\contenthandler\ContentHandler($this->c, 'examplearticle');
+        $res = $this->c['db']->query("SELECT COUNT(*) AS res FROM articles AS a, tags AS t, tags2articles AS ta WHERE ta.articleid = a.id AND ta.tagid = t.id AND t.tag = 'kategorie-1' AND a.stub = 'examplearticle'")->fetch();
+        $this->assertEquals('1', $res['res']);
+        $res = $this->c['db']->query("SELECT COUNT(*) AS res FROM articles AS a, tags AS t, tags2articles AS ta WHERE ta.articleid = a.id AND ta.tagid = t.id AND t.tag = 'kategorie-2' AND a.stub = 'examplearticle'")->fetch();
         $this->assertEquals('1', $res['res']);
     }
 }

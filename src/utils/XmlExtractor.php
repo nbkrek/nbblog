@@ -36,9 +36,19 @@ class XmlExtractor {
             // Date
             $date = (string) $xml->xpath('/' . $type . '/meta/date')[0];
 
+            // Getting all tags
+            $tags = array();
+            $tagxml = $xml->xpath('/' . $type . '/meta/tags');
+            if ($tagxml) {
+                foreach ($tagxml[0]->children() as $tag) {
+                    $tags[] = $tag;
+                }
+            }
+
             return array('title' => $title,
                          'content' => $content,
                          'author' => $author,
+                         'tags' => $tags,
                          'type' => $type,
                          'language' => $language,
                          'date' => $date);

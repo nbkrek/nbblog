@@ -13,22 +13,15 @@ class ArticleTest extends PHPUnit_Framework_TestCase {
             require_once __DIR__ . '/../vendor/twig/twig/lib/Twig/Autoloader.php';
             Twig_Autoloader::register();
 
-            $loader = new Twig_Loader_Filesystem(__DIR__ . '/../defaulttemplate');
+            $loader = new Twig_Loader_Filesystem(__DIR__ . '/../testtemplate');
 
             return new Twig_Environment($loader, array(
                 'cache' => '/tmp/templatecache'
                 ));
 
         };
-        $this->c['db'] = function ($c) {
-            $db = new \PDO('sqlite:/tmp/nbblogtest.db');
-            $db->exec("CREATE TABLE IF NOT EXISTS articles (
-                           id INTEGER PRIMARY KEY, 
-                           stub TEXT, 
-                           publishdate DATETIME)");
 
-            return $db;
-        };
+        include 'db.inc';
     }
 
     protected function tearDown() {
