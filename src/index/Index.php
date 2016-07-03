@@ -4,8 +4,12 @@ namespace nbkrnet\nbblog\index;
 
 class Index {
 
-    function __construct($container) {
+    function __construct($container, $tag = Null) {
         $this->c = $container;
+
+        if ($tag != Null) {
+            throw new \Exception('Unkown Tag');
+        }
     }
 
     public function renderHtml($page=1) {

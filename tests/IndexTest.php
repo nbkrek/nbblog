@@ -1,8 +1,10 @@
 <?php
 
-class IndexTest extends PHPUnit_Framework_TestCase {
+class IndexTest extends PHPUnit_Framework_TestCase 
+{
 
-    protected function setUp() {
+    protected function setUp() 
+    {
         system ('rm -rf ' . __DIR__ . '/../exampledata/examplearticle');
         system ('rm -rf ' . __DIR__ . '/../exampledata/examplepage');
         system ('rm -rf ' . __DIR__ . '/../exampledata/static');
@@ -33,7 +35,8 @@ class IndexTest extends PHPUnit_Framework_TestCase {
         
     }
 
-    protected function tearDown() {
+    protected function tearDown() 
+    {
         system ('rm -rf /tmp/nbblogtest.db');
         system ('rm -rf ' . __DIR__ . '/../exampledata/examplearticle');
         system ('rm -rf ' . __DIR__ . '/../exampledata/examplepage');
@@ -41,12 +44,22 @@ class IndexTest extends PHPUnit_Framework_TestCase {
         system ('rm -rf ' . __DIR__ . '/../exampledata/invalidrenderer');
     }
 
-    public function test_renderHtml() {
-        $this->h->renderHtml();
+    public function test_renderHtml() 
+    {
+        $this->assertTrue(strpos($this->h->renderHtml(), '<html') !== false);
     }
 
-    public function test_renderHtmlSecondPage() {
+    public function test_renderHtmlSecondPage() 
+    {
         $this->h->renderHtml(2);
+    }
+
+    /**
+     * @expectedException Exception
+     */
+    public function test_noexisitingtag()
+    {
+        $h = new \nbkrnet\nbblog\index\Index($this->c, 'non-existing-tag');
     }
 
 

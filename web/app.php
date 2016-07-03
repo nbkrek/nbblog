@@ -90,6 +90,27 @@ $app->get('/', function (Request $request, Response $response) {
     return $response;
 });
 
+$app->get('/tag/{tagid:[a-z0-9-]+$}', function (Request $request, Response $response) {
+    //Tag without / in the url. Redirect to the correct with /.
+    $uri = $request->getUri();
+    $path = $uri->getPath();
+    if ($path != '/' && substr($path, -1) != '/') {
+        $uri = $uri->withPath($path . '/');
+        return $response->withRedirect((string)$uri, 301);
+    }
+});
+
+$app->get('/tag/{tagid:[a-z0-9-]+/$}', function (Request $request, Response $response, $args) {
+    // Tag - show the index
+    try {
+        // Index creation will fail if the given tag doesn't exist inside the database.
+        $index = new Index($this->get('nbblogcontainer'), $tagid);
+    } catch (Exception $e) {
+        return $response->withRedirect('/', 301);
+    }
+    return $response->getBody()->write($index->renderHtml());
+}
+
 
 $app->get('/{stub:[a-z0-9-]+$}', function (Request $request, Response $response, $args) {
     //Article without / in the url. Redirect to the correct with /.
