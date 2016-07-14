@@ -17,10 +17,14 @@ class Index {
         $template = $twig->loadTemplate('index.html'); 
         $language = 'de'; //TODO
 
-        $sql = 'SELECT stub FROM articles ORDER BY publishdate DESC';
+        $offset = $this->c['config_articles-per-page'] * ($page - 1);
+
+        $sql = 'SELECT stub FROM articles ORDER BY publishdate DESC LIMIT ? OFFSET ?';
+        $sth = $this->c['db']->prepare($sql);
+        $sth->execute(array($this->c['config_articles-per-page'], $offset));
 
         $data = array();
-        foreach ($this->c['db']->query($sql) as $res) {
+        while ($res = $sth->fetch()) {
             $textxml = $this->c['config_folders-extract'] . '/' . $res['stub'] . '/text.xml';
 
             $xmlstring = file_get_contents($textxml);

@@ -12,6 +12,7 @@ class IndexTest extends PHPUnit_Framework_TestCase
         $this->c = new \Pimple\Container();
         $this->c['config_folders-articles'] = __DIR__ . '/../exampledata';
         $this->c['config_folders-extract'] = __DIR__ . '/../exampledata';
+        $this->c['config_articles-per-page'] = 2;
 
         $this->c['twig'] = function ($c) {
             // Loading the templating system.
