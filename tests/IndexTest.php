@@ -65,6 +65,14 @@ class IndexTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(strpos($this->h->renderHtml(2), '<a href="/page/1">Previous</a>') !== false);
     }
 
+
+    public function test_renderHtmlWithTag() 
+    {
+        $this->t = new \nbkrnet\nbblog\index\Index($this->c, 'kategorie-1');
+        $this->assertTrue(strpos($this->t->renderHtml(), 'Page 1 of 2') !== false);
+        $this->assertTrue(strpos($this->t->renderHtml(), '<a href="/tag/kategorie-1/page/2">Next</a>') !== false);
+    }
+
     /**
      * @expectedException Exception
      */

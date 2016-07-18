@@ -15,14 +15,14 @@
         {% endfor %}
         <hr>
         {% if previous != Null %}
-            <a href="/page/{{ previous }}">Previous</a>
+            <a href="{% if tag != Null %}/tag/{{ tag }}{% endif %}/page/{{ previous }}">Previous</a>
         {% endif %}
         <center>
         Page {{ pageno }} of {{ pagetotalno }}
         </center>
 
         {% if next != Null %}
-            <a href="/page/{{ next }}">Next</a>
+            <a href="{% if tag != Null %}/tag/{{ tag }}{% endif %}/page/{{ next }}">Next</a>
         {% endif %}
    </body>
 </html>

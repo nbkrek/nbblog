@@ -7,8 +7,18 @@ class Index {
     function __construct($container, $tag = Null) {
         $this->c = $container;
 
-        if ($tag != Null) {
-            throw new \Exception('Unkown Tag');
+        $this->tag = $tag;
+        if ($this->tag != Null) {
+            // Count if this tag exists.
+            $sql = 'SELECT COUNT(*) FROM tags AS t WHERE t.tag = ?';
+            $sth = $this->c['db']->prepare($sql);
+            $sth->execute(array($this->tag));
+            $res = $sth->fetch();
+            if ($res[0] == 0) {
+                throw new \Exception('Unkown Tag');
+            }
+
+
         }
     }
 
@@ -19,13 +29,17 @@ class Index {
 
         $offset = $this->c['config_articles-per-page'] * ($page - 1);
 
-        $sql = 'SELECT stub FROM articles ORDER BY publishdate DESC LIMIT ? OFFSET ?';
-        $sth = $this->c['db']->prepare($sql);
-        $sth->execute(array($this->c['config_articles-per-page'], $offset));
-
-        $sql = 'SELECT stub FROM articles ORDER BY publishdate DESC LIMIT ? OFFSET ?';
-        $sth = $this->c['db']->prepare($sql);
-        $sth->execute(array($this->c['config_articles-per-page'], $offset));
+        $sth = Null;
+        if ($this->tag == Null) { 
+            $sql = 'SELECT stub FROM articles ORDER BY publishdate DESC LIMIT ? OFFSET ?';
+            $sth = $this->c['db']->prepare($sql);
+            $sth->execute(array($this->c['config_articles-per-page'], $offset));
+        } else {
+            // Select only articles for specific tag. TODO
+            $sql = 'SELECT a.stub AS stub FROM articles AS a, tags AS t, tags2articles AS ta WHERE t.tag = ? AND ta.tagid = t.id and ta.articleid = a.id ORDER BY a.publishdate DESC LIMIT ? OFFSET ?';
+            $sth = $this->c['db']->prepare($sql);
+            $sth->execute(array($this->tag, $this->c['config_articles-per-page'], $offset));
+        }
 
         $data = array();
         while ($res = $sth->fetch()) {
@@ -53,7 +67,7 @@ class Index {
             $previous = $page - 1;
         }
 
-        return $template->render(array('data' => $data, 'pageno' => $page, 'pagetotalno' => $pagetotalno, 'next' => $next, 'previous' => $previous));
+        return $template->render(array('data' => $data, 'pageno' => $page, 'pagetotalno' => $pagetotalno, 'next' => $next, 'previous' => $previous, 'tag' => $this->tag));
     }
 
 }
