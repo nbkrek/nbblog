@@ -12,8 +12,17 @@
 
             {{ d.content|raw }}
 
-            <hr />
-            <a href="mailto:{{ d.author.email }}">{{ d.author.name }}</a>
         {% endfor %}
+        <hr>
+        {% if previous != Null %}
+            <a href="/page/{{ previous }}">Previous</a>
+        {% endif %}
+        <center>
+        Page {{ pageno }} of {{ pagetotalno }}
+        </center>
+
+        {% if next != Null %}
+            <a href="/page/{{ next }}">Next</a>
+        {% endif %}
    </body>
 </html>

@@ -23,6 +23,10 @@ class Index {
         $sth = $this->c['db']->prepare($sql);
         $sth->execute(array($this->c['config_articles-per-page'], $offset));
 
+        $sql = 'SELECT stub FROM articles ORDER BY publishdate DESC LIMIT ? OFFSET ?';
+        $sth = $this->c['db']->prepare($sql);
+        $sth->execute(array($this->c['config_articles-per-page'], $offset));
+
         $data = array();
         while ($res = $sth->fetch()) {
             $textxml = $this->c['config_folders-extract'] . '/' . $res['stub'] . '/text.xml';
@@ -35,7 +39,21 @@ class Index {
             $data[] = $article;
         }
 
-        return $template->render(array('data' => $data));
+
+        $sql = 'SELECT COUNT(*) FROM articles';
+        $pagetotalno = ceil($this->c['db']->query($sql)->fetch()[0] / $this->c['config_articles-per-page']);
+
+        $next = Null;
+        if ($page < $pagetotalno) {
+            $next = $page + 1;
+        }
+
+        $previous = Null;
+        if ($page > 1) {
+            $previous = $page - 1;
+        }
+
+        return $template->render(array('data' => $data, 'pageno' => $page, 'pagetotalno' => $pagetotalno, 'next' => $next, 'previous' => $previous));
     }
 
 }

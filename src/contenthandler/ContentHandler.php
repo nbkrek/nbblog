@@ -104,8 +104,13 @@ class ContentHandler {
                 system("rm -rf $folderpath");
             }
 
+            // Create the folder for the article
+            if (! file_exists($folderpath)) {
+                mkdir($folderpath);
+            }
+
             // Extract the tar.bz2 file.
-            system("tar --touch -C " . $this->c['config_folders-extract'] . " -xjf $filepath");
+            system("tar --touch -C " . $folderpath . " -xjf $filepath");
             
         }
     }

@@ -2,21 +2,21 @@
 
 class ContentHandlerTest extends PHPUnit_Framework_TestCase {
     protected function setUp() {
-        system ('rm -rf ' . __DIR__ . '/../exampledata/examplearticle');
-        system ('rm -rf ' . __DIR__ . '/../exampledata/examplepage');
-        system ('rm -rf ' . __DIR__ . '/../exampledata/static');
-        system ('rm -rf ' . __DIR__ . '/../exampledata/invalidrenderer');
+        system ('rm -rf ' . __DIR__ . '/exampledata/examplearticle');
+        system ('rm -rf ' . __DIR__ . '/exampledata/examplepage');
+        system ('rm -rf ' . __DIR__ . '/exampledata/static');
+        system ('rm -rf ' . __DIR__ . '/exampledata/invalidrenderer');
         system ('rm -rf /tmp/nbblogtest.db');
 
         $this->c = new \Pimple\Container();
-        $this->c['config_folders-articles'] = __DIR__ . '/../exampledata';
-        $this->c['config_folders-extract'] = __DIR__ . '/../exampledata';
+        $this->c['config_folders-articles'] = __DIR__ . '/exampledata';
+        $this->c['config_folders-extract'] = __DIR__ . '/exampledata';
         $this->c['twig'] = function ($c) {
             // Loading the templating system.
             require_once __DIR__ . '/../vendor/twig/twig/lib/Twig/Autoloader.php';
             Twig_Autoloader::register();
 
-            $loader = new Twig_Loader_Filesystem(__DIR__ . '/../testtemplate');
+            $loader = new Twig_Loader_Filesystem(__DIR__ . '/testtemplate');
 
             return new Twig_Environment($loader, array(
                 'cache' => '/tmp/templatecache'
@@ -29,10 +29,10 @@ class ContentHandlerTest extends PHPUnit_Framework_TestCase {
     }
 
     protected function tearDown() {
-        #system ('rm -rf ' . __DIR__ . '/../exampledata/examplearticle');
-        system ('rm -rf ' . __DIR__ . '/../exampledata/examplepage');
-        system ('rm -rf ' . __DIR__ . '/../exampledata/static');
-        system ('rm -rf ' . __DIR__ . '/../exampledata/invalidrenderer');
+        #system ('rm -rf ' . __DIR__ . '/exampledata/examplearticle');
+        system ('rm -rf ' . __DIR__ . '/exampledata/examplepage');
+        system ('rm -rf ' . __DIR__ . '/exampledata/static');
+        system ('rm -rf ' . __DIR__ . '/exampledata/invalidrenderer');
         //system ('rm -rf /tmp/nbblogtest.db');
     }
 
@@ -72,9 +72,9 @@ class ContentHandlerTest extends PHPUnit_Framework_TestCase {
     public function test_updateTarFile() {
         // Mainly for code coverage. Not entirly sure how to check the deletion in between.
         $data = new \nbkrnet\nbblog\contenthandler\ContentHandler($this->c, 'examplearticle');
-        system('touch -d "2100-01-01 12:00:00" ' . __DIR__ . '/../exampledata/examplearticle.tar.bz2');
+        system('touch -d "2100-01-01 12:00:00" ' . __DIR__ . '/exampledata/examplearticle.tar.bz2');
         $data = new \nbkrnet\nbblog\contenthandler\ContentHandler($this->c, 'examplearticle');
-        system('touch ' . __DIR__ . '/../exampledata/examplearticle.tar.bz2');
+        system('touch ' . __DIR__ . '/exampledata/examplearticle.tar.bz2');
     }
 
     public function test_getArticleRenderer() {

@@ -1,36 +1,39 @@
 <?php
 
-class PageTest extends PHPUnit_Framework_TestCase {
+class ArticleTest extends PHPUnit_Framework_TestCase {
 
     protected function setUp() {
-        system ('rm -rf ' . __DIR__ . '/../exampledata/examplepage');
+        system ('rm -rf ' . __DIR__ . '/exampledata/examplearticle');
 
         $this->c = new \Pimple\Container();
-        $this->c['config_folders-pages'] = __DIR__ . '/../exampledata';
-        $this->c['config_folders-extract'] = __DIR__ . '/../exampledata';
+        $this->c['config_folders-articles'] = __DIR__ . '/exampledata';
+        $this->c['config_folders-extract'] = __DIR__ . '/exampledata';
         $this->c['twig'] = function ($c) {
             // Loading the templating system.
             require_once __DIR__ . '/../vendor/twig/twig/lib/Twig/Autoloader.php';
             Twig_Autoloader::register();
 
-            $loader = new Twig_Loader_Filesystem(__DIR__ . '/../testtemplate');
+            $loader = new Twig_Loader_Filesystem(__DIR__ . '/testtemplate');
 
             return new Twig_Environment($loader, array(
                 'cache' => '/tmp/templatecache'
                 ));
 
         };
+
+        include 'db.inc';
     }
 
     protected function tearDown() {
-        system ('rm -rf ' . __DIR__ . '/../exampledata/examplepage');
+        system ('rm -rf ' . __DIR__ . '/exampledata/examplearticle');
+        system ('rm -rf /tmp/nbblogtest.db');
     }
 
 
     public function test_renderHtml() {
         $xmlstring = <<<XML
 <?xml version="1.0" encoding="UTF-8" standalone="no" ?>
-<page>
+<article>
 
     <meta>
         <author>
@@ -72,11 +75,12 @@ class PageTest extends PHPUnit_Framework_TestCase {
 
     </content>
 
-</page>
+</article>
 XML;
-        $data = new \nbkrnet\nbblog\page\Page($this->c, $xmlstring);
+        $data = new \nbkrnet\nbblog\article\Article($this->c, $xmlstring);
         $result = $data->renderHtml();
         $this->assertTrue(strpos($result, '<html') !== false);
     }
+
 
 }

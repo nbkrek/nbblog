@@ -3,6 +3,6 @@
   <watchlist>
   <title>src and tests</title>
     <path type="recursive" exec="./vendor/phpunit/phpunit/phpunit" alert="off">./src</path>
-    <path type="recursive" exec="./vendor/phpunit/phpunit/phpunit" alert="off">./unittests</path>
+    <path type="recursive" exec="./vendor/phpunit/phpunit/phpunit" alert="off">./tests</path>
   </watchlist>
 </config>
