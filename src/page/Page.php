@@ -13,12 +13,22 @@ class Page {
 
     public function renderHtml() {
         $twig = $this->c['twig'];
+        $language = $this->c['language'];
 
-        $template = $twig->loadTemplate('page.html'); 
+        // Select the language specific tempate.
+        try {
+            $template = $twig->loadTemplate('page.' . $language . '.html'); 
+        } catch (\Exception $e) {
+            $template = $twig->loadTemplate('page.html'); 
+        }
 
-        $language = 'de'; //TODO
+        // Get the data and set content and title to the lanuage specific one
+        $data = \nbkrnet\nbblog\utils\XmlExtractor::extractor($this->xml);
+        $data['content'] = $data['content'][$language];
+        $data['title'] = $data['title'][$language];
+        $data['language'] = $language;
 
-        return $template->render(array('data' => \nbkrnet\nbblog\utils\XmlExtractor::extractor($this->xml, $language)));
+        return $template->render(array('data' => $data));
     }
 
 }

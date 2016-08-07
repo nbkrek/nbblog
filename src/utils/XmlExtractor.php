@@ -13,20 +13,28 @@ namespace nbkrnet\nbblog\utils;
 
 
 class XmlExtractor {
-    public static function extractor($filecontent, $language = 'de') {
+    public static function extractor($filecontent) {
 
         $xml = new \SimpleXMLElement($filecontent);
         $type = $xml->getName();
 
         // Finding the content of the current language.
-        $content = $xml->xpath('/' . $type . '/content[@language="' . $language . '"]')[0]->asXML();
+        $contents = $xml->xpath('/' . $type . '/content');
 
-        // Removing the <content>-Tags from the actual content.
-        $content = substr($content, strpos($content, '>') + 1);
-        $content = substr($content, 0, strrpos($content, '<'));
+        $title = array();
+        $content = array();
+        $languages = array();
+        for ($i = 0; $i < sizeof($contents); $i++) {
+            $language = (string) $contents[$i]['language'];
+            $languages[] = $language;
+            $title[$language] = $contents[$i]['lanuage'];
+            $content[$language] = $contents[$i]->asXml();
+            // Removing the <content>-Tags from the actual content.
+            $content[$language] = substr($content[$language], strpos($content[$language], '>') + 1);
+            $content[$language] = substr($content[$language], 0, strrpos($content[$language], '<'));
+            
+        }
 
-        // Title
-        $title = (string) $xml->xpath('/' . $type . '/content[@language="' . $language . '"]')[0]['title'];
 
         if ($type == 'article') {
             // Author
@@ -50,13 +58,13 @@ class XmlExtractor {
                          'author' => $author,
                          'tags' => $tags,
                          'type' => $type,
-                         'language' => $language,
+                         'languages' => $languages,
                          'date' => $date);
         } else {
             return array('title' => $title,
                          'content' => $content,
                          'type' => $type,
-                         'language' => $language);
+                         'languages' => $languages);
         }
 
     }

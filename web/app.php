@@ -33,11 +33,23 @@ $container['nbblogcontainer'] = function ($c) {
         //
         // Hoever there is one parameter called 'REDIRECT_URL' that doesn't come from mod_rewrite
         // so i have to exclude this also
-        //
-        // TODO: Make this somehow nicer.
-        if (strpos($key, '-') !== false) {
+        if (ctype_lower(str_replace('REDIRECT_', '', $key))) {
             $nbblogcontainer['config_' . str_replace('REDIRECT_', '', $key)] = $value;
         }
+    }
+
+    // Language selection 
+    // - default value is 'en'
+    $nbblogcontainer['language'] = 'en';
+    // I thought about using the browser settings for the language, but that isn't really realiable.
+
+    // - if there is a valid url parameter we use this
+    if (isset($_GET['language']) && strlen($_GET['language'] == 2 && preg_match('/^[a-z]+$/', $_GET['language'])) {
+        $nbblogcontainer['language'] = $_GET['language'];
+    }
+    // - if the language is set in the environment we just use this language
+    if (isset($nbblogcontainer['config_language'])) {
+        $nbblogcontainer['language'] = $nbblogcontainer['config_language'];
     }
 
     $nbblogcontainer['twig'] = function ($c) {
@@ -69,10 +81,24 @@ $container['nbblogcontainer'] = function ($c) {
 
             $db->exec("CREATE UNIQUE INDEX IF NOT EXISTS tagidx ON tags (tag)");
 
+            $db->exec("CREATE TABLE IF NOT EXISTS languages (
+                           id INTEGER PRIMARY KEY, 
+                           language TEXT
+                           )");
+
+            $db->exec("CREATE UNIQUE INDEX IF NOT EXISTS languageidx ON languages(language)");
+
             $db->exec("CREATE TABLE IF NOT EXISTS tags2articles (
                            tagid INTEGER,
                            articleid INTEGER,
                            FOREIGN KEY(tagid) REFERENCES tags(id),
+                           FOREIGN KEY(articleid) REFERENCES articles(id)
+                           )");
+
+            $db->exec("CREATE TABLE IF NOT EXISTS articles2languages (
+                           languageid INTEGER,
+                           articleid INTEGER,
+                           FOREIGN KEY(languageid) REFERENCES languages(id),
                            FOREIGN KEY(articleid) REFERENCES articles(id)
                            )");
             return $db;

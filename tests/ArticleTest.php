@@ -8,6 +8,7 @@ class ArticleTest extends PHPUnit_Framework_TestCase {
         $this->c = new \Pimple\Container();
         $this->c['config_folders-articles'] = __DIR__ . '/exampledata';
         $this->c['config_folders-extract'] = __DIR__ . '/exampledata';
+        $this->c['language'] = 'en';
         $this->c['twig'] = function ($c) {
             // Loading the templating system.
             require_once __DIR__ . '/../vendor/twig/twig/lib/Twig/Autoloader.php';

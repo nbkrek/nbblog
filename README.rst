@@ -42,13 +42,13 @@ So in the end this is valid::
 
 while this is not ::
 
-    <ul sytle="background-color:yellow">
+    <ul style="background-color:yellow">
         <li>jfdklafadjsl</li>
     </ul>
 
     <img style="border solid 1px" ...>
 
-The template will provide the appropriate CSS classes.
+The template will have to provide the appropriate CSS classes.
 
 Images
 ^^^^^^
@@ -72,7 +72,7 @@ otherwise the regex won't work.
       
 Packaging of articles
 ---------------------
-Articles and every relateded files - images, videos - are stored as tar.bz2
+Articles and all related files - images, videos - are stored as tar.bz2
 archive. For publishing copy it to the articles folder of the system. The
 filename of the tar.bz2 file will be used as the stub where the article is
 published under. This way we have a way to make sure a stub isn't duplicated and

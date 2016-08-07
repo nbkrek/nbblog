@@ -42,16 +42,17 @@ class ContentHandler {
 
                 // Get the article id from the database
                 $sth = $this->c['db']->prepare('SELECT id FROM articles WHERE stub = ?');
-                $res = $sth->execute(array($this->stub));
+                $sth->execute(array($this->stub));
+                $res = $sth->fetch();
 
                 $articleid = Null;
-                if (! isset($sth->fetch()[0])) {
+                if (! isset($res[0])) {
                     // Insert new article
                     $sth2 = $this->c['db']->prepare('INSERT INTO articles (stub, publishdate) VALUES(?, ?)');
                     $sth2->execute(array($this->stub, $this->xml['date']));
                     $articleid = $this->c['db']->lastInsertId();
                 } else {
-                    $aticleid = $sth->fetch()[0];
+                    $articleid = $res[0];
                 }
 
                 // Remove existing tag2article assignements for this article
@@ -66,21 +67,52 @@ class ContentHandler {
 
                     // Get the tag id from the table, if it exists, otherwise create it.
                     $sth = $this->c['db']->prepare('SELECT id FROM tags WHERE tag = ?');
-                    $res = $sth->execute(array($tag));
+                    $sth->execute(array($tag));
+                    $res = $sth->fetch();
                     $tagid = null;
-                    if (! isset($sth->fetch()[0])) {
+                    if (! isset($res[0])) {
                         // Insert new tag
                         $sth2 = $this->c['db']->prepare('INSERT INTO tags (tag) VALUES(?)');
                         $sth2->execute(array($tag));
                         $tagid = $this->c['db']->lastInsertId();
                     } else {
-                        $tagid = $sth->fetch()[0];
+                        $tagid = $res[0];
                     }
 
 
                     // Add the new link
                     $sth = $this->c['db']->prepare('INSERT INTO tags2articles (tagid, articleid) VALUES(?, ?)');
                     $sth->execute(array($tagid, $articleid));
+                }
+
+                // Remove existing articles2languages assignements for this article
+                $sth = $this->c['db']->prepare('DELETE FROM articles2languages WHERE articleid = ?');
+                $sth->execute(array($articleid));
+
+                // We also need to add the tags to the database and link them
+                foreach ($this->xml['languages'] as $language) {
+                    // Normalise language
+                    $language = strtolower($language);
+                    $language = str_replace(' ', '-', $language);
+
+                    // Get the language id from the table, if it exists, otherwise create it.
+                    $sth = $this->c['db']->prepare('SELECT id FROM languages WHERE language = ?');
+                    $sth->execute(array($language));
+                    $res = $sth->fetch();
+                    $languageid = null;
+                    if (! isset($res[0])) {
+                        // Insert new language
+                        $sth2 = $this->c['db']->prepare('INSERT INTO languages (language) VALUES(?)');
+                        $sth2->execute(array($language));
+                        $languageid = $this->c['db']->lastInsertId();
+                    } else {
+                        $languageid = $res[0];
+                    }
+
+
+                    // Add the new link
+                    $sth = $this->c['db']->prepare('INSERT INTO articles2languages (languageid, articleid) VALUES(?, ?)');
+                    $sth->execute(array($languageid, $articleid));
                 }
             }
 

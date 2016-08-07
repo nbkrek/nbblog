@@ -9,6 +9,7 @@ class ContentHandlerTest extends PHPUnit_Framework_TestCase {
         system ('rm -rf /tmp/nbblogtest.db');
 
         $this->c = new \Pimple\Container();
+        $this->c['language'] = 'en';
         $this->c['config_folders-articles'] = __DIR__ . '/exampledata';
         $this->c['config_folders-extract'] = __DIR__ . '/exampledata';
         $this->c['twig'] = function ($c) {

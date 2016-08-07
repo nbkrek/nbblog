@@ -12,6 +12,7 @@ class IndexTest extends PHPUnit_Framework_TestCase
         system ('rm -rf ' . __DIR__ . '/exampledata/invalidrenderer');
         system ('rm -rf /tmp/templatecache');
         $this->c = new \Pimple\Container();
+        $this->c['language'] = 'en';
         $this->c['config_folders-articles'] = __DIR__ . '/exampledata';
         $this->c['config_folders-extract'] = __DIR__ . '/exampledata';
         $this->c['config_articles-per-page'] = 2;
